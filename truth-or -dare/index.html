@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth or Dare: Digital Edition</title>
+    <link rel="icon" type="image/webp" href="https://vstech.co.ke/wp-content/uploads/2025/04/cropped-cropped-logo1-1-scaled-e1744896162328-300x300.webp">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #14176c 0%, #ffaa17 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+        }
+
+        .game-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5);
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.2); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.4); }
+        }
+
+        .setup-screen, .game-screen {
+            color: white;
+        }
+
+        .player-input {
+            margin: 1rem 0;
+        }
+
+        .player-input input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .player-input input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .player-input input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ffaa17, #14176c);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-truth {
+            background: linear-gradient(45deg, #14176c, #ffaa17);
+        }
+
+        .btn-dare {
+            background: linear-gradient(45deg, #ffaa17, #14176c);
+        }
+
+        .current-player {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideIn 0.5s ease-out;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .challenge-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .players-list {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-card.active {
+            border-color: #ffaa17;
+            background: rgba(255, 170, 23, 0.2);
+            transform: scale(1.1);
+        }
+
+        .completion-buttons {
+            margin-top: 1rem;
+        }
+
+        .btn-complete {
+            background: linear-gradient(45deg, #14176c, #ffaa17);
+            margin: 5px;
+        }
+
+        .btn-skip {
+            background: linear-gradient(45deg, #ffaa17, #14176c);
+            margin: 5px;
+        }
+
+        .scores {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="game-container">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <img src="https://vstech.co.ke/wp-content/uploads/elementor/thumbs/cropped-cropped-logo1-scaled-1-r4hyar9ry011idnpvb04e8wufxt04k3ffzbulqvpc0.webp" 
+                 alt="VSTech Logo" style="height: 50px; margin-right: 15px;">
+            <h1>🎮 Truth or Dare</h1>
+        </div>
+        
+        <div id="setupScreen" class="setup-screen">
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.9;">
+                Enter names for all 3 players to begin this epic adventure!
+            </p>
+            
+            <div class="player-input">
+                <input type="text" id="player1" placeholder="🎯 Player 1 Name" maxlength="15">
+            </div>
+            <div class="player-input">
+                <input type="text" id="player2" placeholder="🎯 Player 2 Name" maxlength="15">
+            </div>
+            <div class="player-input">
+                <input type="text" id="player3" placeholder="🎯 Player 3 Name" maxlength="15">
+            </div>
+            
+            <button class="btn" onclick="startGame()">🚀 Start Game</button>
+        </div>
+        
+        <div id="gameScreen" class="game-screen hidden">
+            <div class="players-list" id="playersList"></div>
+            
+            <div class="current-player" id="currentPlayer"></div>
+            
+            <div class="scores" id="scores"></div>
+            
+            <div id="choiceButtons">
+                <button class="btn btn-truth" onclick="chooseTruth()">💭 Truth</button>
+                <button class="btn btn-dare" onclick="chooseDare()">⚡ Dare</button>
+            </div>
+            
+            <div id="challengeArea" class="hidden">
+                <div class="challenge-card">
+                    <div class="challenge-text" id="challengeText"></div>
+                </div>
+                
+                <div class="completion-buttons">
+                    <button class="btn btn-complete" onclick="completeChallenge()">✅ Completed</button>
+                    <button class="btn btn-skip" onclick="skipChallenge()">⏭️ Skip</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="nextPlayer()" id="nextBtn" style="display: none;">Next Player</button>
+            <button class="btn" onclick="restartGame()" style="margin-top: 2rem;">🔄 New Game</button>
+        </div>
+    </div>
+
+    <footer style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); 
+                   color: rgba(255,255,255,0.8); font-size: 0.9rem; text-align: center;">
+        Powered by <a href="https://vstech.co.ke" style="color: #ffaa17; text-decoration: none; font-weight: bold;">VSTech Limited</a>
+    </footer>
+
+    <script>
+        let players = [];
+        let currentPlayerIndex = 0;
+        let scores = {};
+        let gameData = {};
+
+        // Create floating particles
+        function createParticles() {
+            const particleContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // Personalized Truth Questions
+        const truthQuestions = [
+            "What's the most embarrassing thing that happened to you this year?",
+            "Who was your first crush and do you still think about them?",
+            "What's a secret you've never told anyone in this room?",
+            "What's the weirdest dream you've ever had?",
+            "If you could read minds for a day, whose mind would you read first?",
+            "What's the most childish thing you still do?",
+            "What's your biggest fear that you've never told anyone?",
+            "Who in this room would you want to be stranded on an island with?",
+            "What's the most trouble you've ever gotten into?",
+            "What's your guilty pleasure that you're ashamed to admit?",
+            "If you had to delete one app from your phone forever, which would hurt the most?",
+            "What's the worst date you've ever been on?",
+            "Who's the person you've stalked most on social media?",
+            "What's something you pretend to hate but actually love?",
+            "What's the most expensive thing you've ever stolen or 'borrowed'?",
+            "If you could kiss anyone in the world, who would it be and why?",
+            "What's the most embarrassing thing in your search history?",
+            "Who would you choose to be your partner in a zombie apocalypse?",
+            "What's the weirdest thing you've ever eaten and actually enjoyed?",
+            "If you could live in any fictional universe, which would you choose and why?"
+        ];
+
+        // Creative and Fun Dare Challenges
+        const dareQuestions = [
+            "Do your best impression of a celebrity until someone guesses who it is!",
+            "Dance like nobody's watching for 30 seconds to an imaginary song!",
+            "Tell a joke in a funny accent that makes everyone laugh!",
+            "Do 10 push-ups while singing 'Happy Birthday'!",
+            "Act out your favorite movie scene without saying any words!",
+            "Do a runway walk across the room like you're a supermodel!",
+            "Speak in rhymes for the next 3 minutes!",
+            "Do your best beatboxing for 20 seconds!",
+            "Act like your favorite animal until someone guesses what it is!",
+            "Do a dramatic reading of a text message on your phone!",
+            "Sing everything you say for the next 2 minutes!",
+            "Do the chicken dance with full commitment for 30 seconds!",
+            "Tell everyone your most embarrassing childhood story in a funny voice!",
+            "Do 20 jumping jacks while reciting the alphabet backwards!",
+            "Act out how you think you'll look when you're 80 years old!",
+            "Do your best magic trick (even if you don't know any)!",
+            "Speak in a British accent for the next 5 minutes!",
+            "Do your best robot dance for 45 seconds!",
+            "Act out your morning routine in fast forward!",
+            "Do your impression of how each player in the room laughs!"
+        ];
+
+        function startGame() {
+            const p1 = document.getElementById('player1').value.trim();
+            const p2 = document.getElementById('player2').value.trim();
+            const p3 = document.getElementById('player3').value.trim();
+            
+            if (!p1 || !p2 || !p3) {
+                alert('Please enter names for all 3 players! 🎮');
+                return;
+            }
+            
+            players = [p1, p2, p3];
+            scores = {[p1]: 0, [p2]: 0, [p3]: 0};
+            gameData = {
+                [p1]: {completed: 0, skipped: 0},
+                [p2]: {completed: 0, skipped: 0},
+                [p3]: {completed: 0, skipped: 0}
+            };
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // Update players list
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = '';
+            players.forEach((player, index) => {
+                const playerCard = document.createElement('div');
+                playerCard.className = `player-card ${index === currentPlayerIndex ? 'active' : ''}`;
+                playerCard.textContent = player;
+                playersList.appendChild(playerCard);
+            });
+            
+            // Update current player
+            document.getElementById('currentPlayer').innerHTML = 
+                `🎯 ${players[currentPlayerIndex]}'s Turn!`;
+            
+            // Update scores
+            const scoresDiv = document.getElementById('scores');
+            scoresDiv.innerHTML = '';
+            players.forEach(player => {
+                const scoreItem = document.createElement('div');
+                scoreItem.className = 'score-item';
+                scoreItem.innerHTML = `
+                    <div><strong>${player}</strong></div>
+                    <div>✅ ${gameData[player].completed} | ⏭️ ${gameData[player].skipped}</div>
+                `;
+                scoresDiv.appendChild(scoreItem);
+            });
+        }
+
+        function chooseTruth() {
+            const randomTruth = truthQuestions[Math.floor(Math.random() * truthQuestions.length)];
+            showChallenge(randomTruth, 'Truth');
+        }
+
+        function chooseDare() {
+            const randomDare = dareQuestions[Math.floor(Math.random() * dareQuestions.length)];
+            showChallenge(randomDare, 'Dare');
+        }
+
+        function showChallenge(challenge, type) {
+            document.getElementById('choiceButtons').style.display = 'none';
+            document.getElementById('challengeArea').classList.remove('hidden');
+            document.getElementById('challengeText').innerHTML = `
+                <strong>${type}:</strong><br><br>${challenge}
+            `;
+        }
+
+        function completeChallenge() {
+            const currentPlayer = players[currentPlayerIndex];
+            gameData[currentPlayer].completed++;
+            scores[currentPlayer] += 10;
+            
+            // Add celebration effect
+            showCelebration('🎉 Awesome! +10 points!');
+            
+            finishTurn();
+        }
+
+        function skipChallenge() {
+            const currentPlayer = players[currentPlayerIndex];
+            gameData[currentPlayer].skipped++;
+            
+            showCelebration('😅 No worries, maybe next time!');
+            
+            finishTurn();
+        }
+
+        function showCelebration(message) {
+            const celebrationDiv = document.createElement('div');
+            celebrationDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                font-size: 1.2rem;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            celebrationDiv.textContent = message;
+            document.body.appendChild(celebrationDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(celebrationDiv);
+            }, 2000);
+        }
+
+        function finishTurn() {
+            document.getElementById('challengeArea').classList.add('hidden');
+            document.getElementById('choiceButtons').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            updateDisplay();
+        }
+
+        function nextPlayer() {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            document.getElementById('nextBtn').style.display = 'none';
+            updateDisplay();
+        }
+
+        function restartGame() {
+            players = [];
+            currentPlayerIndex = 0;
+            scores = {};
+            gameData = {};
+            
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+            document.getElementById('challengeArea').classList.add('hidden');
+            document.getElementById('choiceButtons').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            // Clear inputs
+            document.getElementById('player1').value = '';
+            document.getElementById('player2').value = '';
+            document.getElementById('player3').value = '';
+        }
+
+        // Add CSS animation for celebration
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize particles when page loads
+        createParticles();
+
+        // Add Enter key support for inputs
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('setupScreen').classList.contains('hidden')) {
+                startGame();
+            }
+        });
+    </script>
+</body>
+</html>
